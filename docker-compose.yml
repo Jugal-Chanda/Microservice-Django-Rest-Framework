@@ -1,0 +1,23 @@
+version: '3'
+services:
+  notification-service:
+    build:
+      context: ./notification-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - DJANGO_SETTINGS_MODULE=notification_service.settings
+
+  user-service:
+    build:
+      context: ./user-service
+    depends_on:
+      - rabbitmq
+    environment:
+      - DJANGO_SETTINGS_MODULE=user_service.settings
+
+  rabbitmq:
+    image: "rabbitmq:3.8-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
