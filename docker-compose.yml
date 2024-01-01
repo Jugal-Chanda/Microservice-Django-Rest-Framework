@@ -1,23 +1,32 @@
-version: '3'
+version: "3.8"
+
 services:
-  notification-service:
+  notification_service:
+    env_file:
+      - .env
+    container_name: notification_service
     build:
-      context: ./notification-service
-    depends_on:
-      - rabbitmq
-    environment:
-      - DJANGO_SETTINGS_MODULE=notification_service.settings
+      context: ./notification_service
+      dockerfile: Dockerfile
+      args:
+        - app_port=${NOTIFICATION_SERVICE_PORT}
+    network_mode: host
+    volumes:
+      - ./notification_service:/app
 
-  user-service:
+    
+    # depends_on:
+    #   - rabbitmq
+
+  user_service:
+    env_file:
+      - .env
+    container_name: user_service
     build:
-      context: ./user-service
-    depends_on:
-      - rabbitmq
-    environment:
-      - DJANGO_SETTINGS_MODULE=user_service.settings
-
-  rabbitmq:
-    image: "rabbitmq:3.8-management"
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+      context: ./users_service
+      dockerfile: Dockerfile
+      args:
+        - app_port=${USER_SERVICE_PORT}
+    network_mode: host
+    volumes:
+      - ./users_service:/app

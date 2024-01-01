@@ -1,8 +1,9 @@
 import json
 import pika
+import os
 
-ROUTING_KEY = 'user.created.key'
-EXCHANGE = 'user_exchange'
+ROUTING_KEY = os.getenv('USER_CREATED_ROUTING_KEY', 'testing_key')
+EXCHANGE = os.getenv('USER_EXCHANGE', 'testing_exchange')
 THREADS = 5
 
 
@@ -25,7 +26,8 @@ class ProducerUserCreated:
     def publish(self, method, body):
         print('Inside UserService: Sending to RabbitMQ: ')
         print(body)
+
         properties = pika.BasicProperties(method)
         self.channel.basic_publish(
-            exchange=EXCHANGE, routing_key=ROUTING_KEY, body=json.dumps(body),
+            exchange=EXCHANGE, routing_key=ROUTING_KEY, body=body,
             properties=properties)

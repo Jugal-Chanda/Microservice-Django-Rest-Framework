@@ -1,8 +1,11 @@
 import json
 import pika
 import threading
-ROUTING_KEY = 'user.created.key'
-EXCHANGE = 'user_exchange'
+from django.core.mail import send_mail
+import os
+
+ROUTING_KEY = os.getenv('USER_CREATED_ROUTING_KEY', 'testing_key')
+EXCHANGE = os.getenv('USER_EXCHANGE', 'testing_exchange')
 THREADS = 5
 
 
@@ -27,10 +30,12 @@ class UserCreatedListener(threading.Thread):
         # print(properties.content_type)
         # print(method)
         if (properties.content_type == "user_created_method"):
+            # print(type(body))
             message = json.loads(body)
-            print(message)
+            send_mail("hello", "hello world", "jugalchanda7@gmail.com",
+                      [message['email']], fail_silently=False)
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def run(self):
-        print('Inside LogginService:  Created Listener ')
+        print("user created listener started")
         self.channel.start_consuming()
